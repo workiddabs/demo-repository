@@ -107,51 +107,63 @@ user_problem_statement: Create an electricity meter calculator that calculates c
 backend:
   - task: "Electricity calculation API endpoints"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented tiered residential pricing, flat rates for commercial/factory, kW to money and money to kW conversion endpoints"
+      - working: true
+        agent: "testing"
+        comment: "All API endpoints are working correctly. Successfully tested GET /api/ health check, GET /api/rates, POST /api/calculate/kw-to-money, POST /api/calculate/money-to-kw, POST /api/calculate, GET /api/calculations, and DELETE /api/calculations endpoints."
 
   - task: "Residential tiered pricing calculation"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented complex tiered pricing: 1-200kW (2.19 AFN), 201-400kW (5.63 AFN), 401-700kW (8.13 AFN), 701-2000kW (11.25 AFN), 2001+kW (12.5 AFN)"
+      - working: true
+        agent: "testing"
+        comment: "Residential tiered pricing calculation is working correctly. Tested single tier (150kW), multiple tiers (250kW), and all tiers (3000kW) scenarios. The breakdown calculations show correct tier distributions and costs."
 
   - task: "Commercial and factory flat rate calculation"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented flat rates: Commercial 16.25 AFN per kW, Factory 6.75 AFN per kW"
+      - working: true
+        agent: "testing"
+        comment: "Commercial and factory flat rate calculations are working correctly. Verified commercial rate of 16.25 AFN per kW and factory rate of 6.75 AFN per kW. Both kW to money and money to kW conversions work as expected."
 
   - task: "Database storage for calculations"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Added MongoDB storage for calculation history and status tracking"
+      - working: true
+        agent: "testing"
+        comment: "Database storage for calculations is working correctly. Successfully tested storing calculations with POST /api/calculate, retrieving them with GET /api/calculations, and clearing them with DELETE /api/calculations."
 
 frontend:
   - task: "Password authentication system"
