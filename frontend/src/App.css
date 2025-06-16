@@ -1,38 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .App {
-    text-align: center;
+  text-align: left;
 }
 
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* Custom scrollbar for dark mode */
+.dark-scrollbar::-webkit-scrollbar {
+  width: 8px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+.dark-scrollbar::-webkit-scrollbar-track {
+  background: #374151;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+.dark-scrollbar::-webkit-scrollbar-thumb {
+  background: #6B7280;
+  border-radius: 4px;
 }
 
-.App-link {
-    color: #61dafb;
+.dark-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+/* Light mode scrollbar */
+.light-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.light-scrollbar::-webkit-scrollbar-track {
+  background: #F3F4F6;
+}
+
+.light-scrollbar::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 4px;
+}
+
+.light-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
+
+/* Animation for smooth transitions */
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+  .overflow-x-auto {
+    font-size: 0.75rem;
+  }
+}
+
+/* Focus states for accessibility */
+input:focus, select:focus, button:focus {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
+}
+
+/* Dropdown animation */
+select {
+  transition: all 0.2s ease;
+}
+
+/* Button hover effects */
+button {
+  transition: all 0.2s ease;
+  transform: translateY(0);
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Card hover effects */
+.shadow-lg {
+  transition: all 0.3s ease;
+}
+
+.shadow-lg:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transform: translateY(-2px);
+}
+
+/* RTL Support for Dari and Pashto */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .grid {
+  direction: rtl;
+}
+
+[dir="rtl"] input, [dir="rtl"] select {
+  text-align: right;
+}
+
+/* Loading animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}
+
+/* Error states */
+.error-input {
+  border-color: #EF4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Success states */
+.success-input {
+  border-color: #10B981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Custom number input styling */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
 }
