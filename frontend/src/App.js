@@ -1,123 +1,159 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import './App.css';
 
-// Translations object with manual translations
-const translations = {
+const APP_PASSWORD = '1236';
+
+const TRANSLATIONS = {
   en: {
-    title: "Electricity Meter Calculator",
-    login: "Login",
-    password: "Password",
-    enterPassword: "Enter password",
-    loginButton: "Login",
-    invalidPassword: "Invalid password",
-    kwToMoney: "Kilowatts to Money",
-    moneyToKw: "Money to Kilowatts", 
-    residential: "Residential",
-    commercial: "Commercial",
-    factory: "Registered Factory",
-    previousReading: "Previous Reading",
-    currentReading: "Current Reading",
-    enterKw: "Enter kW",
-    enterMoney: "Enter Money (AFN)",
-    calculate: "Calculate",
-    consumption: "Monthly Consumption",
-    totalCost: "Total Cost",
-    darkMode: "Dark Mode",
-    lightMode: "Light Mode",
-    language: "Language",
-    english: "English",
-    dari: "دری",
-    pashto: "پښتو",
-    results: "Results",
-    breakdown: "Price Breakdown",
-    tier: "Tier",
-    rate: "Rate",
-    amount: "Amount",
-    cost: "Cost",
-    history: "Consumption History",
-    clear: "Clear History",
-    export: "Export Data",
-    settings: "Settings",
-    resetCalculator: "Reset Calculator"
+    appName: 'E-Breshna - Offline Electricity Meter',
+    heroTitle: 'Offline Electricity Meter by E-Breshna',
+    loginTitle: 'Secure Login',
+    loginHint: 'Password only, works fully offline',
+    password: 'Password',
+    enterPassword: 'Enter password',
+    login: 'Login',
+    wrongPassword: 'Wrong password. Please try again.',
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
+    logout: 'Logout',
+    theme: 'Theme',
+    dark: 'Dark',
+    light: 'Light',
+    language: 'Language',
+    english: 'English',
+    dari: 'دری',
+    pashto: 'پښتو',
+    category: 'Category',
+    residential: 'Residential',
+    commercial: 'Commercial',
+    factory: 'Registered Factory',
+    kwToMoney: 'kWh → AFN',
+    moneyToKw: 'AFN → kWh',
+    previousKw: 'Previous period kWh reading',
+    currentKw: 'Current period kWh reading',
+    previousMoney: 'Previous period money (AFN)',
+    currentMoney: 'Current period money (AFN)',
+    calculate: 'Calculate',
+    amountAfn: 'Amount (AFN)',
+    enterNumber: 'Enter number',
+    result: 'Result',
+    monthlyKw: 'Current month consumption',
+    monthlyMoney: 'Current month spent money',
+    estimatedBill: 'Estimated bill by selected category',
+    total: 'Total',
+    tierTable: 'Tariff breakdown table',
+    tier: 'Tier',
+    rate: 'Rate (AFN)',
+    usedKw: 'kWh',
+    cost: 'Cost (AFN)',
+    moneyShare: 'Money used (AFN)',
+    convertedKw: 'Converted kWh',
+    sectionHelp: 'Press Enter after typing values to confirm and calculate.',
+    invalidReadings: 'Current values must be greater than or equal to previous values.',
+    invalidAmount: 'Please enter a value greater than zero.',
+    madeBy: 'Made by: Yaser Rahimi'
   },
   fa: {
-    title: "محاسبه گر میتر برق",
-    login: "ورود",
-    password: "رمز عبور",
-    enterPassword: "رمز عبور را وارد کنید",
-    loginButton: "ورود",
-    invalidPassword: "رمز عبور نامعتبر",
-    kwToMoney: "کیلووات به پول",
-    moneyToKw: "پول به کیلووات",
-    residential: "مسکونی",
-    commercial: "تجاری",
-    factory: "کارخانه ثبت شده",
-    previousReading: "قرائت قبلی",
-    currentReading: "قرائت فعلی",
-    enterKw: "کیلووات وارد کنید",
-    enterMoney: "پول وارد کنید (افغانی)",
-    calculate: "محاسبه",
-    consumption: "مصرف ماهانه",
-    totalCost: "کل هزینه",
-    darkMode: "حالت تاریک",
-    lightMode: "حالت روشن",
-    language: "زبان",
-    english: "انگلیسی",
-    dari: "دری",
-    pashto: "پښتو",
-    results: "نتایج",
-    breakdown: "تفکیک قیمت",
-    tier: "سطح",
-    rate: "نرخ",
-    amount: "مقدار",
-    cost: "هزینه",
-    history: "تاریخچه مصرف",
-    clear: "پاک کردن تاریخچه",
-    export: "صادرات داده ها",
-    settings: "تنظیمات",
-    resetCalculator: "بازنشانی محاسبه گر"
+    appName: 'E-Breshna - Offline Electricity Meter',
+    heroTitle: 'Offline Electricity Meter by E-Breshna',
+    loginTitle: 'ورود امن',
+    loginHint: 'فقط رمز عبور، کاملاً آفلاین',
+    password: 'رمز عبور',
+    enterPassword: 'رمز عبور را وارد کنید',
+    login: 'ورود',
+    wrongPassword: 'رمز عبور اشتباه است.',
+    showPassword: 'نمایش رمز',
+    hidePassword: 'پنهان‌سازی رمز',
+    logout: 'خروج',
+    theme: 'تم',
+    dark: 'تاریک',
+    light: 'روشن',
+    language: 'زبان',
+    english: 'English',
+    dari: 'دری',
+    pashto: 'پښتو',
+    category: 'بخش',
+    residential: 'مسکونی',
+    commercial: 'تجاری',
+    factory: 'کارخانه ثبت‌شده',
+    kwToMoney: 'کیلووات ساعت → افغانی',
+    moneyToKw: 'افغانی → کیلووات ساعت',
+    previousKw: 'قرائت کیلووات قبلی',
+    currentKw: 'قرائت کیلووات فعلی',
+    previousMoney: 'پول دوره قبلی (AFN)',
+    currentMoney: 'پول دوره فعلی (AFN)',
+    calculate: 'محاسبه',
+    amountAfn: 'مقدار (AFN)',
+    enterNumber: 'عدد وارد کنید',
+    result: 'نتیجه',
+    monthlyKw: 'مصرف ماه جاری',
+    monthlyMoney: 'مبلغ مصرف‌شده ماه جاری',
+    estimatedBill: 'هزینه تخمینی بر اساس بخش انتخاب‌شده',
+    total: 'مجموع',
+    tierTable: 'جدول تفکیک تعرفه',
+    tier: 'پله',
+    rate: 'نرخ (AFN)',
+    usedKw: 'کیلووات',
+    cost: 'هزینه (AFN)',
+    moneyShare: 'سهم پول (AFN)',
+    convertedKw: 'کیلووات تبدیل‌شده',
+    sectionHelp: 'برای تأیید و محاسبه بعد از ورود مقدار Enter بزنید.',
+    invalidReadings: 'مقادیر فعلی باید بزرگ‌تر یا مساوی مقادیر قبلی باشند.',
+    invalidAmount: 'لطفاً عددی بزرگ‌تر از صفر وارد کنید.',
+    madeBy: 'ساخته شده توسط: Yaser Rahimi'
   },
   ps: {
-    title: "د بریښنا میټر محاسبه کونکی",
-    login: "ننوتل",
-    password: "پټ نوم",
-    enterPassword: "پټ نوم ولیکئ",
-    loginButton: "ننوتل",
-    invalidPassword: "غلط پټ نوم",
-    kwToMoney: "کیلووات څخه پیسو ته",
-    moneyToKw: "پیسې څخه کیلووات ته",
-    residential: "استوګنې",
-    commercial: "سوداګریز",
-    factory: "راجسټر شوې فابریکه",
-    previousReading: "پخوانی لوستل",
-    currentReading: "اوسنی لوستل",
-    enterKw: "کیلووات ولیکئ",
-    enterMoney: "پیسې ولیکئ (افغانۍ)",
-    calculate: "محاسبه",
-    consumption: "میاشتنی مصرف",
-    totalCost: "ټول لګښت",
-    darkMode: "تیاره حالت",
-    lightMode: "رڼا حالت",
-    language: "ژبه",
-    english: "انګلیسي",
-    dari: "دري",
-    pashto: "پښتو",
-    results: "پایلې",
-    breakdown: "د نرخ توپیر",
-    tier: "کچه",
-    rate: "نرخ",
-    amount: "اندازه",
-    cost: "لګښت",
-    history: "د مصرف تاریخ",
-    clear: "تاریخ پاک کول",
-    export: "معلومات صادرول",
-    settings: "تنظیمات",
-    resetCalculator: "محاسبه کونکی بیا پیل"
+    appName: 'E-Breshna - Offline Electricity Meter',
+    heroTitle: 'Offline Electricity Meter by E-Breshna',
+    loginTitle: 'خوندي ننوتل',
+    loginHint: 'یوازې پاسورډ، په بشپړ ډول آفلاین',
+    password: 'پاسورډ',
+    enterPassword: 'پاسورډ ولیکئ',
+    login: 'ننوتل',
+    wrongPassword: 'پاسورډ ناسم دی.',
+    showPassword: 'پاسورډ ښکاره کړئ',
+    hidePassword: 'پاسورډ پټ کړئ',
+    logout: 'وتل',
+    theme: 'بڼه',
+    dark: 'تیاره',
+    light: 'روښانه',
+    language: 'ژبه',
+    english: 'English',
+    dari: 'دری',
+    pashto: 'پښتو',
+    category: 'کټګوري',
+    residential: 'استوګنیز',
+    commercial: 'سوداګریز',
+    factory: 'ثبت شوې فابریکه',
+    kwToMoney: 'kWh → AFN',
+    moneyToKw: 'AFN → kWh',
+    previousKw: 'د تېرې مودې kWh',
+    currentKw: 'د اوسنۍ مودې kWh',
+    previousMoney: 'د تېرې مودې پیسې (AFN)',
+    currentMoney: 'د اوسنۍ مودې پیسې (AFN)',
+    calculate: 'محاسبه',
+    amountAfn: 'مقدار (AFN)',
+    enterNumber: 'شمېره ولیکئ',
+    result: 'پایله',
+    monthlyKw: 'د روانې میاشتې مصرف',
+    monthlyMoney: 'د روانې میاشتې لګول شوې پیسې',
+    estimatedBill: 'د ټاکل شوې کټګورۍ له مخې اټکلي بیل',
+    total: 'ټول',
+    tierTable: 'د تعرفې جزییات',
+    tier: 'کچه',
+    rate: 'بیه (AFN)',
+    usedKw: 'kWh',
+    cost: 'لګښت (AFN)',
+    moneyShare: 'کارول شوې پیسې (AFN)',
+    convertedKw: 'بدلې شوې kWh',
+    sectionHelp: 'له شمېرې وروسته Enter کېکاږئ تر څو محاسبه وشي.',
+    invalidReadings: 'اوسني ارزښتونه باید د پخوانیو ارزښتونو نه کم نه وي.',
+    invalidAmount: 'مهرباني وکړئ له صفر څخه لویه شمېره دننه کړئ.',
+    madeBy: 'جوړونکی: Yaser Rahimi'
   }
 };
 
-// Rate configurations
-const rates = {
+const TARIFFS = {
   residential: [
     { min: 1, max: 200, rate: 2.19 },
     { min: 201, max: 400, rate: 5.63 },
@@ -125,431 +161,381 @@ const rates = {
     { min: 701, max: 2000, rate: 11.25 },
     { min: 2001, max: Infinity, rate: 12.5 }
   ],
-  commercial: { rate: 16.25 },
-  factory: { rate: 6.75 }
+  commercial: [{ min: 0, max: Infinity, rate: 16.25 }],
+  factory: [{ min: 0, max: Infinity, rate: 6.75 }]
 };
 
+const formatNumber = (value) => Number(value || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
+
 function App() {
+  const [language, setLanguage] = useState('en');
+  const [darkMode, setDarkMode] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [password, setPassword] = useState('');
-  const [darkMode, setDarkMode] = useState(false);
-  const [language, setLanguage] = useState('en');
-  const [currentType, setCurrentType] = useState('residential');
-  
-  // Calculator states
-  const [kwToMoneyData, setKwToMoneyData] = useState({
-    previousReading: '',
-    currentReading: '',
-    result: null,
-    breakdown: []
-  });
-  
-  const [moneyToKwData, setMoneyToKwData] = useState({
-    amount: '',
-    result: null
-  });
-  
-  const [history, setHistory] = useState([]);
+  const [showPassword, setShowPassword] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('residential');
+
+  const [kwInputs, setKwInputs] = useState({ prevKw: '', currKw: '', prevMoney: '', currMoney: '' });
+  const [kwResult, setKwResult] = useState(null);
+
+  const [moneyInput, setMoneyInput] = useState('');
+  const [moneyResult, setMoneyResult] = useState(null);
+
+  const rtl = language !== 'en';
+  const t = (key) => TRANSLATIONS[language][key] || key;
 
   useEffect(() => {
-    const savedData = localStorage.getItem('electricityMeterData');
-    if (savedData) {
-      const data = JSON.parse(savedData);
-      setDarkMode(data.darkMode || false);
-      setLanguage(data.language || 'en');
-      setHistory(data.history || []);
-    }
+    const saved = JSON.parse(localStorage.getItem('ebreshna-offline') || '{}');
+    if (saved.language) setLanguage(saved.language);
+    if (typeof saved.darkMode === 'boolean') setDarkMode(saved.darkMode);
   }, []);
 
-  const saveToLocalStorage = () => {
-    const data = {
-      darkMode,
-      language,
-      history
-    };
-    localStorage.setItem('electricityMeterData', JSON.stringify(data));
-  };
+  useEffect(() => {
+    localStorage.setItem('ebreshna-offline', JSON.stringify({ language, darkMode }));
+    document.documentElement.setAttribute('dir', rtl ? 'rtl' : 'ltr');
+  }, [language, darkMode, rtl]);
 
-  const t = (key) => translations[language][key] || key;
+  const categoryOptions = useMemo(
+    () => [
+      { key: 'residential', label: t('residential') },
+      { key: 'commercial', label: t('commercial') },
+      { key: 'factory', label: t('factory') }
+    ],
+    [language]
+  );
 
-  const handleLogin = () => {
-    if (password === '1236') {
-      setIsLoggedIn(true);
-      setPassword('');
-    } else {
-      alert(t('invalidPassword'));
-    }
-  };
-
-  const calculateResidentialCost = (kw) => {
-    let totalCost = 0;
-    let remainingKw = kw;
+  const getTierBreakdownFromKw = (kw, category) => {
+    let remainingKw = Number(kw);
     const breakdown = [];
 
-    for (const tier of rates.residential) {
+    for (const slab of TARIFFS[category]) {
       if (remainingKw <= 0) break;
-      
-      const tierUsage = Math.min(remainingKw, tier.max - tier.min + 1);
-      if (tierUsage > 0) {
-        const tierCost = tierUsage * tier.rate;
-        totalCost += tierCost;
-        breakdown.push({
-          tier: `${tier.min}-${tier.max === Infinity ? '∞' : tier.max}`,
-          usage: tierUsage,
-          rate: tier.rate,
-          cost: tierCost
-        });
-        remainingKw -= tierUsage;
-      }
+      const slabSize = slab.max === Infinity ? Infinity : slab.max - slab.min + 1;
+      const used = slabSize === Infinity ? remainingKw : Math.min(remainingKw, slabSize);
+      const cost = used * slab.rate;
+
+      breakdown.push({
+        tier: `${slab.min}-${slab.max === Infinity ? '∞' : slab.max}`,
+        kw: used,
+        rate: slab.rate,
+        cost
+      });
+      remainingKw -= used;
     }
 
-    return { totalCost, breakdown };
+    return breakdown;
   };
 
-  const calculateCommercialCost = (kw) => {
-    const totalCost = kw * rates.commercial.rate;
-    return { 
-      totalCost, 
-      breakdown: [{ 
-        tier: '0-∞', 
-        usage: kw, 
-        rate: rates.commercial.rate, 
-        cost: totalCost 
-      }] 
-    };
+  const getBreakdownFromMoney = (amount, category) => {
+    let remainingMoney = Number(amount);
+    const breakdown = [];
+
+    for (const slab of TARIFFS[category]) {
+      if (remainingMoney <= 0) break;
+      const slabSize = slab.max === Infinity ? Infinity : slab.max - slab.min + 1;
+      const slabMaxMoney = slabSize === Infinity ? Infinity : slabSize * slab.rate;
+
+      const usedMoney = slabMaxMoney === Infinity ? remainingMoney : Math.min(remainingMoney, slabMaxMoney);
+      const convertedKw = usedMoney / slab.rate;
+
+      breakdown.push({
+        tier: `${slab.min}-${slab.max === Infinity ? '∞' : slab.max}`,
+        kw: convertedKw,
+        rate: slab.rate,
+        cost: usedMoney
+      });
+
+      remainingMoney -= usedMoney;
+    }
+
+    return breakdown;
   };
 
-  const calculateFactoryCost = (kw) => {
-    const totalCost = kw * rates.factory.rate;
-    return { 
-      totalCost, 
-      breakdown: [{ 
-        tier: '0-∞', 
-        usage: kw, 
-        rate: rates.factory.rate, 
-        cost: totalCost 
-      }] 
-    };
+  const onLogin = () => {
+    if (password === APP_PASSWORD) {
+      setIsLoggedIn(true);
+      setPassword('');
+      return;
+    }
+    alert(t('wrongPassword'));
   };
 
   const calculateKwToMoney = () => {
-    const prevReading = parseFloat(kwToMoneyData.previousReading) || 0;
-    const currReading = parseFloat(kwToMoneyData.currentReading) || 0;
-    const consumption = currReading - prevReading;
+    const prevKw = Number(kwInputs.prevKw);
+    const currKw = Number(kwInputs.currKw);
+    const prevMoney = Number(kwInputs.prevMoney);
+    const currMoney = Number(kwInputs.currMoney);
 
-    if (consumption <= 0) {
-      alert('Current reading must be greater than previous reading');
+    if (currKw < prevKw || currMoney < prevMoney) {
+      alert(t('invalidReadings'));
       return;
     }
 
-    let result;
-    switch (currentType) {
-      case 'residential':
-        result = calculateResidentialCost(consumption);
-        break;
-      case 'commercial':
-        result = calculateCommercialCost(consumption);
-        break;
-      case 'factory':
-        result = calculateFactoryCost(consumption);
-        break;
-      default:
-        return;
-    }
+    const monthlyKw = currKw - prevKw;
+    const monthlyMoney = currMoney - prevMoney;
+    const breakdown = getTierBreakdownFromKw(monthlyKw, activeCategory);
+    const estimatedBill = breakdown.reduce((sum, row) => sum + row.cost, 0);
 
-    const calculationResult = {
-      consumption,
-      totalCost: result.totalCost,
-      breakdown: result.breakdown,
-      type: currentType,
-      timestamp: new Date().toISOString()
-    };
-
-    setKwToMoneyData({
-      ...kwToMoneyData,
-      result: calculationResult
-    });
-
-    // Add to history
-    const newHistory = [...history, calculationResult];
-    setHistory(newHistory);
-    saveToLocalStorage();
+    setKwResult({ monthlyKw, monthlyMoney, breakdown, estimatedBill });
   };
 
   const calculateMoneyToKw = () => {
-    const amount = parseFloat(moneyToKwData.amount) || 0;
-    if (amount <= 0) return;
-
-    let totalKw = 0;
-
-    switch (currentType) {
-      case 'residential':
-        let remainingAmount = amount;
-        for (const tier of rates.residential) {
-          if (remainingAmount <= 0) break;
-          
-          const tierRange = tier.max === Infinity ? Infinity : tier.max - tier.min + 1;
-          const maxTierCost = tierRange === Infinity ? Infinity : tierRange * tier.rate;
-          
-          if (remainingAmount >= maxTierCost && tierRange !== Infinity) {
-            totalKw += tierRange;
-            remainingAmount -= maxTierCost;
-          } else {
-            totalKw += remainingAmount / tier.rate;
-            break;
-          }
-        }
-        break;
-      case 'commercial':
-        totalKw = amount / rates.commercial.rate;
-        break;
-      case 'factory':
-        totalKw = amount / rates.factory.rate;
-        break;
+    const amount = Number(moneyInput);
+    if (!(amount > 0)) {
+      alert(t('invalidAmount'));
+      return;
     }
 
-    setMoneyToKwData({
-      ...moneyToKwData,
-      result: { totalKw: Math.round(totalKw * 100) / 100 }
-    });
+    const breakdown = getBreakdownFromMoney(amount, activeCategory);
+    const convertedKw = breakdown.reduce((sum, row) => sum + row.kw, 0);
+
+    setMoneyResult({ amount, breakdown, convertedKw });
   };
 
-  const clearHistory = () => {
-    setHistory([]);
-    localStorage.removeItem('electricityMeterData');
-  };
-
-  const resetCalculator = () => {
-    setKwToMoneyData({ previousReading: '', currentReading: '', result: null, breakdown: [] });
-    setMoneyToKwData({ amount: '', result: null });
-  };
-
-  const handleKeyPress = (e, action) => {
-    if (e.key === 'Enter') {
-      action();
-    }
+  const handleEnter = (event, action) => {
+    if (event.key === 'Enter') action();
   };
 
   if (!isLoggedIn) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
-        <div className={`p-8 rounded-lg shadow-lg w-96 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white'}`}>
-          <h1 className="text-2xl font-bold text-center mb-6">{t('login')}</h1>
-          <div className="space-y-4">
+      <div className={`app-shell ${darkMode ? 'dark' : ''}`}>
+        <div className="login-card fade-in-up">
+          <div className="top-strip">
+            <h1 className="brand-title">{t('appName')}</h1>
+            <div className="top-actions">
+              <div className="moving-select-wrap" title={t('language')}>
+                <span>🌐</span>
+                <select value={language} onChange={(e) => setLanguage(e.target.value)} className="moving-select">
+                  <option value="en">{t('english')}</option>
+                  <option value="fa">{t('dari')}</option>
+                  <option value="ps">{t('pashto')}</option>
+                </select>
+              </div>
+              <button type="button" className="icon-btn" onClick={() => setDarkMode((v) => !v)}>
+                {darkMode ? '☀️' : '🌙'}
+              </button>
+            </div>
+          </div>
+
+          <h2>{t('loginTitle')}</h2>
+          <p>{t('loginHint')}</p>
+
+          <label className="field-label">{t('password')}</label>
+          <div className="password-wrap">
             <input
-              type="password"
-              placeholder={t('enterPassword')}
+              type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              onKeyPress={(e) => handleKeyPress(e, handleLogin)}
-              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
-              }`}
+              onKeyDown={(e) => handleEnter(e, onLogin)}
+              placeholder={t('enterPassword')}
             />
             <button
-              onClick={handleLogin}
-              className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition-colors"
+              type="button"
+              className="eye-btn"
+              title={showPassword ? t('hidePassword') : t('showPassword')}
+              onClick={() => setShowPassword((v) => !v)}
             >
-              {t('loginButton')}
+              👁️
             </button>
           </div>
+
+          <button type="button" className="primary-btn" onClick={onLogin}>
+            {t('login')}
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
-      {/* Header */}
-      <header className={`${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg p-4`}>
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
-          <h1 className="text-2xl font-bold">{t('title')}</h1>
-          
-          <div className="flex flex-wrap items-center space-x-4">
-            {/* Language Selector */}
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className={`p-2 rounded-lg border ${
-                darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
-              }`}
-            >
+    <div className={`app-shell ${darkMode ? 'dark' : ''}`}>
+      <header className="main-header fade-in-up">
+        <div className="header-left">
+          <div className="logo-bolt">⚡</div>
+          <div>
+            <h1 className="brand-title">{t('appName')}</h1>
+            <p className="hero-subtitle">{t('heroTitle')}</p>
+          </div>
+        </div>
+
+        <div className="header-actions">
+          <div className="moving-select-wrap" title={t('language')}>
+            <span>🌐</span>
+            <select value={language} onChange={(e) => setLanguage(e.target.value)} className="moving-select">
               <option value="en">{t('english')}</option>
               <option value="fa">{t('dari')}</option>
               <option value="ps">{t('pashto')}</option>
             </select>
-
-            {/* Theme Toggle */}
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className={`p-2 rounded-lg ${
-                darkMode ? 'bg-yellow-500 text-black' : 'bg-gray-800 text-white'
-              }`}
-            >
-              {darkMode ? t('lightMode') : t('darkMode')}
-            </button>
-
-            {/* Category Selector */}
-            <select
-              value={currentType}
-              onChange={(e) => setCurrentType(e.target.value)}
-              className={`p-2 rounded-lg border ${
-                darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
-              }`}
-            >
-              <option value="residential">{t('residential')}</option>
-              <option value="commercial">{t('commercial')}</option>
-              <option value="factory">{t('factory')}</option>
-            </select>
           </div>
+
+          <button type="button" className="icon-btn" title={t('theme')} onClick={() => setDarkMode((v) => !v)}>
+            {darkMode ? '☀️' : '🌙'}
+          </button>
+
+          <button type="button" className="icon-btn" title={t('logout')} onClick={() => setIsLoggedIn(false)}>
+            🚪
+          </button>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto p-4">
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* KW to Money Calculator */}
-          <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg p-6`}>
-            <h2 className="text-xl font-bold mb-4">{t('kwToMoney')}</h2>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">{t('previousReading')}</label>
-                <input
-                  type="number"
-                  value={kwToMoneyData.previousReading}
-                  onChange={(e) => setKwToMoneyData({...kwToMoneyData, previousReading: e.target.value})}
-                  placeholder={t('enterKw')}
-                  className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
-                  }`}
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-2">{t('currentReading')}</label>
-                <input
-                  type="number"
-                  value={kwToMoneyData.currentReading}
-                  onChange={(e) => setKwToMoneyData({...kwToMoneyData, currentReading: e.target.value})}
-                  onKeyPress={(e) => handleKeyPress(e, calculateKwToMoney)}
-                  placeholder={t('enterKw')}
-                  className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
-                  }`}
-                />
-              </div>
-              
-              <button
-                onClick={calculateKwToMoney}
-                className="w-full bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 transition-colors"
-              >
-                {t('calculate')}
-              </button>
-              
-              {kwToMoneyData.result && (
-                <div className={`mt-4 p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                  <h3 className="font-bold text-lg mb-2">{t('results')}</h3>
-                  <p><span className="font-medium">{t('consumption')}:</span> {kwToMoneyData.result.consumption} kW</p>
-                  <p><span className="font-medium">{t('totalCost')}:</span> {kwToMoneyData.result.totalCost.toFixed(2)} AFN</p>
-                  
-                  <div className="mt-4">
-                    <h4 className="font-bold mb-2">{t('breakdown')}</h4>
-                    <div className="space-y-1">
-                      {kwToMoneyData.result.breakdown.map((item, index) => (
-                        <div key={index} className="text-sm">
-                          <span>{t('tier')} {item.tier}: {item.usage.toFixed(2)} kW × {item.rate} AFN = {item.cost.toFixed(2)} AFN</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Money to KW Calculator */}
-          <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg p-6`}>
-            <h2 className="text-xl font-bold mb-4">{t('moneyToKw')}</h2>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">{t('amount')}</label>
-                <input
-                  type="number"
-                  value={moneyToKwData.amount}
-                  onChange={(e) => setMoneyToKwData({...moneyToKwData, amount: e.target.value})}
-                  onKeyPress={(e) => handleKeyPress(e, calculateMoneyToKw)}
-                  placeholder={t('enterMoney')}
-                  className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
-                  }`}
-                />
-              </div>
-              
-              <button
-                onClick={calculateMoneyToKw}
-                className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                {t('calculate')}
-              </button>
-              
-              {moneyToKwData.result && (
-                <div className={`mt-4 p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                  <h3 className="font-bold text-lg mb-2">{t('results')}</h3>
-                  <p><span className="font-medium">Kilowatts:</span> {moneyToKwData.result.totalKw} kW</p>
-                </div>
-              )}
-            </div>
-          </div>
+      <main className="dashboard fade-in-up">
+        <div className="category-row">
+          <label>{t('category')}</label>
+          <select value={activeCategory} onChange={(e) => setActiveCategory(e.target.value)} className="category-select">
+            {categoryOptions.map((option) => (
+              <option key={option.key} value={option.key}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
 
-        {/* History Section */}
-        {history.length > 0 && (
-          <div className={`mt-6 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg p-6`}>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">{t('history')}</h2>
-              <div className="space-x-2">
-                <button
-                  onClick={resetCalculator}
-                  className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors"
-                >
-                  {t('resetCalculator')}
-                </button>
-                <button
-                  onClick={clearHistory}
-                  className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
-                >
-                  {t('clear')}
-                </button>
-              </div>
+        <section className="split-grid">
+          <article className="meter-card">
+            <h2>⚡ {t('kwToMoney')}</h2>
+            <p className="hint">{t('sectionHelp')}</p>
+
+            <div className="fields-grid">
+              <label>
+                {t('previousKw')}
+                <input
+                  type="number"
+                  value={kwInputs.prevKw}
+                  onChange={(e) => setKwInputs((s) => ({ ...s, prevKw: e.target.value }))}
+                  placeholder={t('enterNumber')}
+                />
+              </label>
+              <label>
+                {t('currentKw')}
+                <input
+                  type="number"
+                  value={kwInputs.currKw}
+                  onChange={(e) => setKwInputs((s) => ({ ...s, currKw: e.target.value }))}
+                  onKeyDown={(e) => handleEnter(e, calculateKwToMoney)}
+                  placeholder={t('enterNumber')}
+                />
+              </label>
+              <label>
+                {t('previousMoney')}
+                <input
+                  type="number"
+                  value={kwInputs.prevMoney}
+                  onChange={(e) => setKwInputs((s) => ({ ...s, prevMoney: e.target.value }))}
+                  placeholder={t('enterNumber')}
+                />
+              </label>
+              <label>
+                {t('currentMoney')}
+                <input
+                  type="number"
+                  value={kwInputs.currMoney}
+                  onChange={(e) => setKwInputs((s) => ({ ...s, currMoney: e.target.value }))}
+                  onKeyDown={(e) => handleEnter(e, calculateKwToMoney)}
+                  placeholder={t('enterNumber')}
+                />
+              </label>
             </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className={`${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                    <th className="p-2 text-left">Date</th>
-                    <th className="p-2 text-left">Type</th>
-                    <th className="p-2 text-left">Consumption (kW)</th>
-                    <th className="p-2 text-left">Cost (AFN)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {history.slice(-10).reverse().map((record, index) => (
-                    <tr key={index} className={`border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                      <td className="p-2">{new Date(record.timestamp).toLocaleDateString()}</td>
-                      <td className="p-2 capitalize">{record.type}</td>
-                      <td className="p-2">{record.consumption}</td>
-                      <td className="p-2">{record.totalCost.toFixed(2)}</td>
+
+            <button type="button" className="primary-btn" onClick={calculateKwToMoney}>
+              {t('calculate')}
+            </button>
+
+            {kwResult && (
+              <div className="result-box">
+                <h3>{t('result')}</h3>
+                <p>{t('monthlyKw')}: <strong>{formatNumber(kwResult.monthlyKw)} kWh</strong></p>
+                <p>{t('monthlyMoney')}: <strong>{formatNumber(kwResult.monthlyMoney)} AFN</strong></p>
+                <p>{t('estimatedBill')}: <strong>{formatNumber(kwResult.estimatedBill)} AFN</strong></p>
+
+                <h4>{t('tierTable')}</h4>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{t('tier')}</th>
+                      <th>{t('usedKw')}</th>
+                      <th>{t('rate')}</th>
+                      <th>{t('cost')}</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+                  </thead>
+                  <tbody>
+                    {kwResult.breakdown.map((row, index) => (
+                      <tr key={`kw-${index}`}>
+                        <td>{row.tier}</td>
+                        <td>{formatNumber(row.kw)}</td>
+                        <td>{formatNumber(row.rate)}</td>
+                        <td>{formatNumber(row.cost)}</td>
+                      </tr>
+                    ))}
+                    <tr className="total-row">
+                      <td>{t('total')}</td>
+                      <td>{formatNumber(kwResult.breakdown.reduce((s, r) => s + r.kw, 0))}</td>
+                      <td>-</td>
+                      <td>{formatNumber(kwResult.breakdown.reduce((s, r) => s + r.cost, 0))}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </article>
+
+          <article className="meter-card">
+            <h2>💰 {t('moneyToKw')}</h2>
+            <p className="hint">{t('sectionHelp')}</p>
+
+            <label>
+              {t('amountAfn')}
+              <input
+                type="number"
+                value={moneyInput}
+                onChange={(e) => setMoneyInput(e.target.value)}
+                onKeyDown={(e) => handleEnter(e, calculateMoneyToKw)}
+                placeholder={t('enterNumber')}
+              />
+            </label>
+
+            <button type="button" className="primary-btn" onClick={calculateMoneyToKw}>
+              {t('calculate')}
+            </button>
+
+            {moneyResult && (
+              <div className="result-box">
+                <h3>{t('result')}</h3>
+                <p>{t('convertedKw')}: <strong>{formatNumber(moneyResult.convertedKw)} kWh</strong></p>
+
+                <h4>{t('tierTable')}</h4>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{t('tier')}</th>
+                      <th>{t('moneyShare')}</th>
+                      <th>{t('rate')}</th>
+                      <th>{t('usedKw')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {moneyResult.breakdown.map((row, index) => (
+                      <tr key={`money-${index}`}>
+                        <td>{row.tier}</td>
+                        <td>{formatNumber(row.cost)}</td>
+                        <td>{formatNumber(row.rate)}</td>
+                        <td>{formatNumber(row.kw)}</td>
+                      </tr>
+                    ))}
+                    <tr className="total-row">
+                      <td>{t('total')}</td>
+                      <td>{formatNumber(moneyResult.breakdown.reduce((s, r) => s + r.cost, 0))}</td>
+                      <td>-</td>
+                      <td>{formatNumber(moneyResult.breakdown.reduce((s, r) => s + r.kw, 0))}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </article>
+        </section>
       </main>
+
+      <footer className="footer-note">{t('madeBy')}</footer>
     </div>
   );
 }
