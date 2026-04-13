@@ -1,0 +1,60 @@
+/* Global theme */
+QMainWindow {
+    background: #0f172a;
+    color: #e2e8f0;
+}
+
+QToolBar {
+    background: #111827;
+    border-bottom: 1px solid #1f2937;
+    spacing: 8px;
+    padding: 8px;
+}
+
+QToolButton {
+    color: #e5e7eb;
+    background: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 8px;
+    padding: 6px 12px;
+}
+
+QToolButton:hover {
+    background: #334155;
+}
+
+QToolButton:checked {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+QListWidget#Sidebar {
+    background: #020617;
+    border-right: 1px solid #1e293b;
+    color: #cbd5e1;
+    font-size: 14px;
+    outline: 0;
+}
+
+QListWidget#Sidebar::item {
+    padding: 10px;
+    border-bottom: 1px solid #0b1221;
+}
+
+QListWidget#Sidebar::item:selected {
+    background: #1d4ed8;
+    color: #f8fafc;
+}
+
+QSpinBox {
+    color: #e5e7eb;
+    background: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 6px;
+    padding: 3px 8px;
+    min-width: 72px;
+}
+
+QLabel {
+    color: #cbd5e1;
+}
