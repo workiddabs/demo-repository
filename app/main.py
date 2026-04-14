@@ -7,7 +7,12 @@ from pathlib import Path
 
 from PyQt6.QtWidgets import QApplication
 
-from app.ui.main_window import MainWindow
+if __package__ in {None, ""}:
+    # Support `python app/main.py` by ensuring repository root is importable.
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from app.ui.main_window import MainWindow
+else:
+    from .ui.main_window import MainWindow
 
 
 def load_stylesheet(app: QApplication) -> None:
